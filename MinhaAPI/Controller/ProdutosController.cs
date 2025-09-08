@@ -19,52 +19,87 @@ namespace MinhaAPI.Controller
         [HttpGet]
         public ActionResult<IEnumerable<Produto>> Get()
         {
-            var produtos = _context.Produtos.ToList();
-            if (!produtos.Any())
-                return NotFound("Nenhum produto cadastrado");
-            return Ok(produtos);
+            try
+            {
+                var produtos = _context.Produtos.AsNoTracking().ToList();
+                if (!produtos.Any())
+                    return NotFound("Nenhum produto cadastrado");
+                return Ok(produtos);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao solicitar consulta");
+            }
         }
 
         [HttpGet("{id:int}", Name = "ObterProduto")]
         public ActionResult<Produto> Get(int id)
         {
-            var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
-            if (produto == null)
-                return NotFound("Produto não encontrado");
-            return Ok(produto);
+            try
+            {
+                var produto = _context.Produtos.AsNoTracking().FirstOrDefault(p => p.ProdutoId == id);
+                if (produto == null)
+                    return NotFound("Produto não encontrado");
+                return Ok(produto);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao solicitar consulta");
+            }
         }
 
         [HttpPost]
         public ActionResult Post([FromBody] Produto produto)
         {
-            if (produto == null)
-                return BadRequest("Dados inválidos");
-            _context.Produtos.Add(produto);
-            _context.SaveChanges();
+            try
+            {
+                if (produto == null)
+                    return BadRequest("Dados inválidos");
+                _context.Produtos.Add(produto);
+                _context.SaveChanges();
 
-            return new CreatedAtRouteResult("ObterProduto", new { id = produto.ProdutoId }, produto);
+                return new CreatedAtRouteResult("ObterProduto", new { id = produto.ProdutoId }, produto);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao criar produto");
+            }
         }
 
         [HttpPut("{id:int}")]
         public ActionResult Put(int id, Produto produto)
         {
-            if (id != produto.ProdutoId)
-                return BadRequest("Dados inválidos");
-            _context.Entry(produto).State = EntityState.Modified;
-            _context.SaveChanges();
+            try
+            {
+                if (id != produto.ProdutoId)
+                    return BadRequest("Dados inválidos");
+                _context.Entry(produto).State = EntityState.Modified;
+                _context.SaveChanges();
 
-            return Ok(produto);
+                return Ok(produto);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao atualizar produto");
+            }
         }
 
         [HttpDelete("{id:int}")]
         public ActionResult Delete(int id)
         {
-            var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
-            if (produto == null)
-                return NotFound("Produto não encontrado");
-            _context.Produtos.Remove(produto);
-            _context.SaveChanges();
-            return Ok(produto);
+            try
+            {
+                var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
+                if (produto == null)
+                    return NotFound("Produto não encontrado");
+                _context.Produtos.Remove(produto);
+                _context.SaveChanges();
+                return Ok(produto);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao remover produto");
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace MinhaAPI.Domain
 {
@@ -23,6 +24,7 @@ namespace MinhaAPI.Domain
         public float Estoque { get; set; }
         public DateTime DataCadastro { get; set; }
 
+        [JsonIgnore]
         public Categoria? Categoria { get; set; }
     }
 }
